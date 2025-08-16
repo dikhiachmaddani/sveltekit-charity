@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"prebuild": "mkdir -p .netlify/functions-internal && cp functions/hello.js .netlify/functions-internal/",
+		"prebuild": "mkdir -p .netlify/functions-internal && cp functions/payment.js .netlify/functions-internal/",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
