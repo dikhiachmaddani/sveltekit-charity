@@ -12,8 +12,14 @@ const config = {
 		adapter: adapter({
 			// Netlify adapter options
 			edge: false,
-			split: false
-		})
+			split: false,
+			// Ensure proper function generation
+			includeFiles: ['static/**/*']
+		}),
+		// Ensure proper routing
+		paths: {
+			base: ''
+		}
 	}
 };
 
