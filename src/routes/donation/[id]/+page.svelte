@@ -10,8 +10,10 @@
 	let data: CharitiesType | undefined;
 	let loading = true;
 	let error = false;
-	let donationAmount = '';
-	let selectedCharity = '';
+
+	let name = '';
+	let email = '';
+	let amount: number | undefined;
 	let agreed = false;
 
 	function getCharity(id: string) {
@@ -20,32 +22,43 @@
 		});
 	}
 
-	function handleSubmit(event: Event) {
+	async function handleSubmit(event: Event) {
 		event.preventDefault();
-
-		if (!donationAmount || !selectedCharity || !agreed) {
-			alert('Please fill in all required fields and agree to the terms.');
+		if (!agreed) {
+			alert('Please agree to the terms and conditions.');
 			return;
 		}
-
-		const amount = parseFloat(donationAmount);
-		if (amount < 5) {
+		if (amount && amount < 5) {
 			alert('Minimum donation amount is $5.');
 			return;
 		}
+		if (!name || !email) {
+			alert('Please fill in all required fields.');
+			return;
+		}
 
-		alert(`Thank you for your $${amount} donation to ${selectedCharity}!`);
+		const resMid = await fetch('/.netlify/functions/payment', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				id: params.id,
+				amount: amount,
+				name,
+				email
+			})
+		});
+		console.log(resMid);
+		const midtransData = await resMid.json();
+		window.location.href = midtransData.url;
 	}
 
 	onMount(function () {
 		setTimeout(() => {
 			const charity = getCharity(params.id);
-			if (charity) {
-				data = charity;
-				selectedCharity = charity.title;
-			} else {
-				error = true;
-			}
+			if (charity) data = charity;
+			else error = true;
 			loading = false;
 		}, 1000);
 	});
@@ -119,24 +132,36 @@
 										id="xs-donate-amount"
 										class="form-control"
 										placeholder="Minimum of $5"
+										bind:value={amount}
 										min="5"
 										step="0.01"
-										bind:value={donationAmount}
 										required
 									/>
 								</div>
 								<div class="xs-input-group">
 									<label for="xs-donate-charity"
-										>Charity Name
+										>Your Name
 										<span class="color-light-red">**</span></label
 									>
 									<input
 										type="text"
-										name="charity-name"
+										name="name"
 										id="xs-donate-charity"
 										class="form-control"
-										value={data.title}
-										readonly
+										bind:value={name}
+									/>
+								</div>
+								<div class="xs-input-group">
+									<label for="xs-donate-charity"
+										>Your Email
+										<span class="color-light-red">**</span></label
+									>
+									<input
+										type="email"
+										name="email"
+										id="xs-donate-charity"
+										class="form-control"
+										bind:value={email}
 									/>
 								</div>
 								<div class="xs-input-group" id="xs-input-checkbox">
@@ -144,8 +169,8 @@
 										type="checkbox"
 										name="agree"
 										id="xs-donate-agree"
-										bind:checked={agreed}
 										required
+										bind:checked={agreed}
 									/>
 									<label for="xs-donate-agree">
 										I Agree to the terms and conditions

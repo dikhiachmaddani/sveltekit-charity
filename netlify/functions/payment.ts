@@ -1,6 +1,6 @@
-const Midtrans = require('midtrans-client');
+import { Snap } from 'midtrans-client';
 
-exports.handler = async (event, context) => {
+export const handler = async (event: any) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -8,32 +8,20 @@ exports.handler = async (event, context) => {
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight OPTIONS request
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
-  }
-
   try {
-    // Initialize Midtrans Snap
-    const snap = new Midtrans.Snap({
+    const snap = new Snap({
       isProduction: false,
-      serverKey: process.env.MIDTRANS_SERVER_KEY,
-      clientKey: process.env.MIDTRANS_CLIENT_KEY
+      serverKey: process.env.MIDTRANS_SERVER_KEY!,
+      clientKey: process.env.MIDTRANS_CLIENT_KEY!
     });
 
-    // Parse request body
     const { id, name, email, amount } = JSON.parse(event.body);
 
-    // Validate required fields
     if (!id || !name || !email || !amount) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           error: 'Missing required fields',
           required: ['id', 'name', 'email', 'amount'],
           received: { id, name, email, amount }
@@ -41,7 +29,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Parse name into first and last name
     const names = name.split(" ");
     let firstName, lastName;
     if (names.length > 1) {
@@ -52,10 +39,8 @@ exports.handler = async (event, context) => {
       lastName = "";
     }
 
-    // Generate unique order ID
     const orderId = `BWA-CHARITY-${id}-${Date.now()}`;
 
-    // Prepare transaction parameters
     const parametersTransaction = {
       transaction_details: {
         order_id: orderId,
@@ -71,31 +56,25 @@ exports.handler = async (event, context) => {
       }
     };
 
-    // Create transaction
     const transaction = await snap.createTransaction(parametersTransaction);
-    const { token, redirect_url } = transaction;
-    
-    console.log("Token: ", token);
-    console.log("Redirect URL: ", redirect_url);
-
+    const { redirect_url } = transaction;
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        url: redirect_url, 
-        params: transaction,
-        orderId: orderId
+        url: redirect_url,
+        params: parametersTransaction
       })
     };
 
   } catch (error) {
     console.error("Payment Error: ", error);
-    
+
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: 'Payment processing failed',
         message: error.message,
         timestamp: new Date().toISOString()

@@ -5,7 +5,6 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"prebuild": "mkdir -p .netlify/functions-internal && cp functions/payment.js .netlify/functions-internal/",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -24,7 +23,7 @@
 		"@sveltejs/kit": "^2.31.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
 		"@types/leaflet": "^1.9.20",
-		"@types/lodash": "^4.17.20",
+		"@types/node": "^24.3.0",
 		"@vitest/browser": "^3.2.3",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
@@ -48,11 +47,8 @@
 	},
 	"dependencies": {
 		"axios": "^1.11.0",
-		"axios-extensions": "^3.1.6",
-		"follow-redirects": "^1.15.11",
 		"leaflet": "^1.9.4",
 		"lodash": "^4.17.21",
-		"midtrans-client": "^1.4.3",
-		"proxy-from-env": "^1.1.0"
+		"midtrans-client": "^1.4.3"
 	}
 }
