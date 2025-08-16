@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { CharitiesType } from '../_domain/CharitiesType';
+	import type { CharitiesType } from '../domain/CharitiesType';
 	import Modal from './Modal.svelte';
+	import { fly } from 'svelte/transition';
 
 	export let charities: CharitiesType[];
 	let isOpenModal = false;
@@ -119,8 +120,8 @@
 								<img src={charity.thumbnail} alt="" />
 
 								<div class="xs-skill-bar">
-									<div class="xs-skill-track">
-										<p>
+									<div class="xs-skill-track" style="width: {calculatedFounded(charity.pledged, charity.target)}%;">
+										<p in:fly={{ delay: 5000, x: -100 }} style="left: 100%;">
 											<span
 												class="number-percentage-count number-percentage"
 												data-value="90"

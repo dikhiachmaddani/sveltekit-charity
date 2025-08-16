@@ -49,7 +49,6 @@
 				email
 			})
 		});
-		console.log(resMid);
 		const midtransData = await resMid.json();
 		window.location.href = midtransData.url;
 	}
